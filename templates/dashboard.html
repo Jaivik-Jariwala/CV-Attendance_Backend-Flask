@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Capture Image</div>
+                <div class="card-body">
+                    <form method="POST" action="/dashboard/capture_image">
+                        <button type="submit" class="btn btn-primary">Capture Image</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Map Face using ML</div>
+                <div class="card-body">
+                    <form method="POST" action="/dashboard/map_face">
+                        <button type="submit" class="btn btn-primary">Map Face</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Student Data</div>
+                <div class="card-body">
+                    <a href="/dashboard/student_data" class="btn btn-primary">View Student Data</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Present/Absent Data</div>
+                <div class="card-body">
+                    <a href="/dashboard/present_absent_data" class="btn btn-primary">View Present/Absent Data</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

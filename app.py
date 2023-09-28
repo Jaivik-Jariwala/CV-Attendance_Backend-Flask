@@ -73,7 +73,7 @@ def login():
         if user and user.password == form.password.data:
             login_user(user, remember=form.remember.data)
             flash('Sucessfully Logged in!', 'Welcome')
-            return redirect(url_for('home'))
+            return redirect(url_for('dashboard'))
         else:
             flash('Login Failed, Do check your credentials!!', 'Sorry')
     return render_template('login.html', form=form)
