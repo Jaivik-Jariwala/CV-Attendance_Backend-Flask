@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "#1*6j!a&a3i8$d##p!!"  # replaced with our Best secret key
 app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = "sqlite:///your_database.db"  # used SQlite for database
+] = "sqlite:///dblogs.db"  # used SQlite for database and our db name is dbLogs, Use three slashes for SQLite
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -25,6 +25,10 @@ class User(db.Model, UserMixin):
     role = db.Column(
         db.String(20), nullable=False, default="user"
     )  # Default role is 'user'
+
+# Create the database tables
+with app.app_context():
+    db.create_all()
 
 # Creating registration modules 
 
