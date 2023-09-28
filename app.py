@@ -59,10 +59,10 @@ def register():
             user = User(username=form.username.data, password=form.password.data, role=form.role.data)
             db.session.add(user)
             db.session.commit() # MYSQLALCHEMY DOCS FOR MORE INFO, you can goto quickinfo for more info
-            flash('Sucessfully registered', 'PERFECT!')
+            flash('Sucessfully registered', 'sucess')
             return redirect(url_for('login'))
         else:
-            flash('OOPS! sorry you are not authorized for this role.', 'sorry')
+            flash('OOPS! sorry you are not authorized for this role.', 'danger')
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -72,10 +72,12 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.password == form.password.data:
             login_user(user, remember=form.remember.data)
-            flash('Sucessfully Logged in!', 'Welcome')
-            return redirect(url_for('dashboard'))
+            flash('Sucessfully loged in!', 'success')
+            
+            # Redirecting to the dashboard page after successful login
+            return redirect(url_for('dashboard')) 
         else:
-            flash('Login Failed, Do check your credentials!!', 'Sorry')
+            flash('Please check your credentials.', 'danger')
     return render_template('login.html', form=form)
 
 
@@ -98,9 +100,11 @@ def logout():
 @login_required
 def dashboard():
     if current_user.role in ('developer', 'teacher'):
-        return 'This dashboard is specifically for users and developers !!'
+        return 'This dashboard is specifically for teachers and developers !!'
     else:
         return 'You are not authorized to access this page.'
+    
+
 
 if __name__ == "__main__":
     app.run(debug=True) # For developer to view error, we will change this as False after deployment
