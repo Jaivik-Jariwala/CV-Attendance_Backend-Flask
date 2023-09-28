@@ -1,6 +1,6 @@
 
 # imorting necessary modules
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash,request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -100,11 +100,64 @@ def logout():
 @login_required
 def dashboard():
     if current_user.role in ('developer', 'teacher'):
-        return 'This dashboard is specifically for teachers and developers !!'
+        return render_template('dashboard.html')  # Render the dashboard template
     else:
         return 'You are not authorized to access this page.'
-    
 
+# capturing image routing
+@app.route('/dashboard/capture_image', methods=['POST'])
+@login_required
+def capture_image():
+    if current_user.role in ('developer', 'teacher'):
+     # put your code of capturing image here
+        return 'Image captured successfully!'  # Return a success message
+    else:
+        return 'You are not authorized to capture an image.'
+
+# Mapping face using AI ML
+@app.route('/dashboard/map_face', methods=['POST'])
+@login_required
+def map_face():
+    if current_user.role in ('developer', 'teacher'):
+        # put AI Ml code here
+        return 'Face mapped successfully!'  # Return a success message
+    else:
+        return 'You are not authorized to map a face.'
+
+# Student data routing
+@app.route('/dashboard/student_data', methods=['GET'])
+@login_required
+def student_data():
+    if current_user.role in ('developer', 'teacher'):
+        # drop your AI Ml code for fetching data form data set
+        students = [
+            {'id': 1, 'name': 'Student 1', 'roll_number': '001'},
+            {'id': 2, 'name': 'Student 2', 'roll_number': '002'},
+            # Add more student data dictionaries as needed
+        ]
+        # Render the student_data.html template with the student data
+        return render_template('student_data.html', students=students)
+    else:
+        return 'You are not authorized to access student data.'
+
+# Routing to capture image and determine present/absent status
+@app.route('/dashboard/present_absent_data', methods=['GET', 'POST'])
+@login_required
+def present_absent_data():
+    if current_user.role in ('developer', 'teacher'):
+        if request.method == 'POST':
+            # Here, dropt  your code to capture an image and send it to your AI-ML model
+            # and the model will determine the present/absent status and return the result
+            # I took for example result=Present
+            result = 'Present'
+
+            # It will render data to present_Absent table
+            return render_template('present_absent_data.html', result=result)
+        else:
+            # you can display the formto capture image
+            return render_template('capture_image.html')
+    else:
+        return 'You are not authorized to access present/absent data.'
 
 if __name__ == "__main__":
     app.run(debug=True) # For developer to view error, we will change this as False after deployment
