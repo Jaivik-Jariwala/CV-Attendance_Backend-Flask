@@ -1,45 +1,25 @@
-{% extends 'base.html' %}
-{% block body %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">Registration</div>
-                <div class="card-body">
-                    <form action="/register" method="POST">
-                        {{ form.hidden_tag() }}
-                        <div class="form-group">
-                            {{ form.username.label(class="form-control-label") }}
-                            {{ form.username(class="form-control", placeholder="Enter your username") }}
-                            {% for error in form.username.errors %}
-                            <small class="form-text text-danger">{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        <div class="form-group">
-                            {{ form.password.label(class="form-control-label") }}
-                            {{ form.password(class="form-control", placeholder="Enter your password") }}
-                            {% for error in form.password.errors %}
-                            <small class="form-text text-danger">{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        <div class="form-group">
-                            {{ form.confirm_password.label(class="form-control-label") }}
-                            {{ form.confirm_password(class="form-control", placeholder="Confirm your password") }}
-                            {% for error in form.confirm_password.errors %}
-                            <small class="form-text text-danger">{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        <div class="form-group">
-                            {{ form.role.label(class="form-control-label") }}
-                            {{ form.role(class="form-control") }}
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock body %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Register</title>
+</head>
+
+<body>
+    <h1>Register</h1>
+
+    <form action="/register" method="post">
+        {{ form.hidden_tag() }}
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <input type="password" name="confirm_password" placeholder="Confirm Password">
+        <select name="role">
+            <option value="user">User</option>
+            <option value="developer">Developer</option>
+            <option value="teacher">Teacher</option>
+        </select>
+        <input type="submit" value="Register">
+    </form>
+</body>
+
+</html>
