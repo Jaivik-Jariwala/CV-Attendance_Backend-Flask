@@ -78,7 +78,7 @@ class LoginForm(FlaskForm):
 
 
 # Creating routes for login and registration
-# Here we will only accept login to system of Professors and We developers
+# Here we will only accept login to system from Professors and We developers
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -153,7 +153,7 @@ def dashboard():
         return "You are not authorized to access this page."
 
 
-# Serve the capture_image.html page
+# Serve the capture.html page
 @app.route('/dashboard/capture_image_page')
 @login_required
 def capture_image_page():
