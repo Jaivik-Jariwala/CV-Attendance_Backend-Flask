@@ -146,16 +146,51 @@ def dashboard():
         return "You are not authorized to access this page."
 
 
-# capturing image routing
-@app.route("/dashboard/capture_image", methods=["POST"])
+# Serve the capture_image.html page
+@app.route('/dashboard/capture_image_page')
+@login_required
+def capture_image_page():
+    return render_template('capture.html')
+
+# New route for capturing and processing images
+@app.route('/dashboard/capture_image', methods=['POST'])
 @login_required
 def capture_image():
-    if current_user.role in ("developer", "teacher"):
-        # put your code of capturing image here
-        return "Image captured successfully!"  # Return a success message
-    else:
-        return "You are not authorized to capture an image."
+    faces = []
+    try:
+        # Capture image from the request data
+        data = request.get_json()
+        photo_data = data.get('photoData')
 
+        # Decode base64 image data and save it as a file with the current date and time
+        current_date_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"{current_date_time}.png"
+
+        image_data = base64.b64decode(photo_data.split(',')[1])
+        image = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
+        cv2.imwrite(filename, image)
+
+        # Perform face detection on the captured photo
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5, minSize=(30, 30))
+
+        if len(faces) == 0:
+            return jsonify({"error": "No faces found in the image"})
+
+        # Convert the captured image to base64 for displaying it on the page
+        _, buffer = cv2.imencode('.jpg', image)
+        captured_photo_base64 = base64.b64encode(buffer).decode('utf-8')
+
+        return jsonify({"message": f"Image processed successfully: Number of detected faces: {len(faces)}",
+                        "capturedPhoto": captured_photo_base64})
+    
+    except Exception as e:
+        detected_faces_count = len(faces)
+        print(f"Number of faces detected: {detected_faces_count}")
+        print("Error: ", e)
+        return jsonify({"error": f"Error processing the image. Detected {detected_faces_count} faces."})
+    
 
 # Mapping face using AI ML
 @app.route("/dashboard/map_face", methods=["POST"])
@@ -166,7 +201,6 @@ def map_face():
         return "Face mapped successfully!"  # Return a success message
     else:
         return "You are not authorized to map a face."
-
 
 # Student data routing
 @app.route("/dashboard/student_data", methods=["GET"])

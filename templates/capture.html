@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Capture Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #live-video {
+            width: 480px; /* Adjust the width */
+            height: 360px; /* Adjust the height */
+            border: 1px solid #ccc;
+            background-color: #fff;
+            transition: all 0.3s ease; /* Add transition for smooth resizing */
+        }
+
+        #capture {
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #capture:hover {
+            background-color: #0056b3;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        #captured-image {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        #captured-photo {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #faces-detected {
+            font-size: 18px;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        #faces-count {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Capture Image</h1>
+    <div>
+        <video id="live-video" width="480" height="360" autoplay></video>
+    </div>
+    <button id="capture">Capture</button>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <div id="captured-image">
+        <img id="captured-photo" src="" alt="Captured Image">
+        <div id="faces-detected">Number of Faces Detected: <span id="faces-count">0</span></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        const liveVideo = document.getElementById('live-video');
+        const captureButton = document.getElementById('capture');
+        const capturedImageDiv = document.getElementById('captured-image');
+        const capturedPhoto = document.getElementById('captured-photo');
+        const facesCountSpan = document.getElementById('faces-count');
+        const canvas = document.getElementById('canvas');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                liveVideo.srcObject = stream;
+            })
+            .catch((error) => {
+                console.error('Error accessing webcam:', error);
+            });
+
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            context.drawImage(liveVideo, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            // Send the captured image data to the server via AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/dashboard/capture_image', // Change the URL to match your Flask route
+                data: JSON.stringify({ photoData: imageData }),
+                contentType: 'application/json',
+                success: (response) => {
+                    console.log(response);
+                    if (response.message) {
+                        // Hide live video and display the captured image
+                        liveVideo.style.display = 'none';
+                        capturedImageDiv.style.display = 'block';
+                        capturedPhoto.src = `data:image/jpeg;base64,${response.capturedPhoto}`;
+                        // Display the number of detected faces
+                        facesCountSpan.textContent = `${response.message}`;
+                    }
+                    // Handle the response from the server here
+                },
+                error: (error) => {
+                    console.error('Error sending image data:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
