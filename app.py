@@ -1,5 +1,5 @@
 # imorting necessary modules
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, jsonify, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager,
