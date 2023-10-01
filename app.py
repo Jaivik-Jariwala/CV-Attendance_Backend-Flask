@@ -12,6 +12,13 @@ from flask_login import (
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, EqualTo, Length
+from PIL import Image, ImageDraw, ImageFont
+import cv2
+import numpy as np
+import base64
+import os
+from datetime import datetime
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "#1*6j!a&a3i8$d##p!!"
