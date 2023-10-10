@@ -17,6 +17,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, EqualTo, Length
 import base64
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from PyPDF2 import PdfFileReader, PdfFileWriter
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "#1*6j!a&a3i8$d##p!!"
@@ -148,6 +152,89 @@ def dashboard():
         return render_template("dashboard.html")  # Render the dashboard template
     else:
         return "You are not authorized to access this page."
+
+def generate_pdf_report(attendance_data):
+    # Create a PDF canvas
+    pdf_file_path = "attendance_report.pdf"
+    c = canvas.Canvas(pdf_file_path, pagesize=letter)
+
+    # Add content to the PDF
+    c.drawString(100, 750, "Attendance Report")
+    c.drawString(100, 730, "Date: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+    # Loop through attendance data and add it to the PDF
+    y_offset = 700
+    for entry in attendance_data:
+        name = entry["name"]
+        roll_no = entry["roll_no"]
+        status = entry["status"]
+
+        c.drawString(100, y_offset, f"Name: {name}")
+        c.drawString(100, y_offset - 20, f"Roll No: {roll_no}")
+        c.drawString(100, y_offset - 40, f"Status: {status}")
+        y_offset -= 60
+
+    # Save the PDF file
+    c.save()
+
+    return pdf_file_path
+
+from PyPDF2 import PdfFileReader
+
+@app.route("/dashboard/scrape_pdf", methods=["GET"])
+@login_required
+def scrape_pdf():
+    if current_user.role in ("developer", "teacher"):
+        # Replace 'your_existing_pdf.pdf' with the path to the PDF you want to scrape
+        pdf_path = "your_existing_pdf.pdf"
+
+        # Open and read the PDF
+        pdf_data = []
+        with open(pdf_path, "rb") as pdf_file:
+            pdf_reader = PdfFileReader(pdf_file)
+            num_pages = pdf_reader.numPages
+
+            for page_num in range(num_pages):
+                page = pdf_reader.getPage(page_num)
+                page_text = page.extractText()
+                pdf_data.append(page_text)
+
+        # Process the scraped data as needed
+        # Extract name, roll number, image, and attendance information
+        # Add the extracted data to your database or perform any desired operations
+
+        return jsonify({"message": "PDF data scraped successfully", "data": pdf_data})
+    else:
+        return "You are not authorized to access PDF scraping functionality."
+
+
+@app.route("/dashboard/present_absent_data", methods=["GET", "POST"])
+@login_required
+def present_absent_data():
+    if current_user.role in ("developer", "teacher"):
+        if request.method == "POST":
+            # Your code for capturing and processing images and determining attendance status
+            # Store attendance data in a list like attendance_data = [{"name": "John", "roll_no": "001", "status": "Present"}, ...]
+
+            # Generate a PDF report
+            pdf_file_path = generate_pdf_report(attendance_data)
+
+            # Return the PDF file for download
+            with open(pdf_file_path, "rb") as pdf_file:
+                response = pdf_file.read()
+
+            return Response(
+                response,
+                content_type="application/pdf",
+                headers={
+                    "Content-Disposition": f"attachment; filename=attendance_report.pdf"
+                },
+            )
+        else:
+            # You can display the form to capture images
+            return render_template("capture_image.html")
+    else:
+        return "You are not authorized to access present/absent data."
 
 
 # Add a new route for capturing and processing images
